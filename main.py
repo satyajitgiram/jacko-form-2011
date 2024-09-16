@@ -34,6 +34,7 @@ def append_in_code_storage(cred, data):
     mycursor.execute(q,data)
     db.commit()
     print('Data append in code storage')
+    db.close()
 
 def fetch_otp_from_google_sheet(passport_no, phone_no):
     try:
@@ -47,6 +48,7 @@ def fetch_otp_from_google_sheet(passport_no, phone_no):
         mycursor.execute(q)
         filtered_data = mycursor.fetchone()
         # data_ = GoogleSheetHandler(sheet_name=config.SHEET_CODE_STORAGE, spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP).getsheet_records()
+        db.close()
     except Exception as e:
         # logger.error(f"Error fetching otp from Google Sheets: {e}")
         return "Internal Server Error - Could not get data from Database", 500
@@ -76,6 +78,7 @@ def home():
             data_ = mycursor.fetchall()
             # print(data_)
             # print(type(data_))
+            db.close()
         except Exception as e:
             print("Exeption -", e)
             return "Internal Server Error-Could Not Get Data from Database", 500
@@ -121,6 +124,7 @@ def home():
                             mycursor = db.cursor()
                             mycursor.execute(q,value)
                             db.commit()
+                            db.close()
                             response = requests.get(f'https://www.call2all.co.il/ym/api/RunTzintuk?token=025089532:7974153&callerId=RAND&phones=${phone_no}')
                             response_json = json.loads(response.text)
 
@@ -214,6 +218,7 @@ def home():
                             mycursor = db.cursor()
                             mycursor.execute(q,value)
                             db.commit()
+                            db.close()
                             response = requests.get(f'https://www.call2all.co.il/ym/api/RunTzintuk?token=025089532:7974153&callerId=RAND&phones=${phone_no}')
                             response_json = json.loads(response.text)
 
@@ -301,6 +306,7 @@ def home():
                 mycursor = db.cursor()
                 mycursor.execute(q,value)
                 db.commit()
+                db.close()
                 return json.dumps({
                                 "Passport Number" : passport_no,
                                 "Phone Number" : phone_no,
@@ -328,6 +334,7 @@ def home():
                 mycursor = db.cursor()
                 mycursor.execute(q,value)
                 db.commit()
+                db.close()
 
                 return json.dumps(
                     {
@@ -363,7 +370,7 @@ def home():
                         mycursor = db.cursor()
                         mycursor.execute(q,value)
                         db.commit()
-
+                        db.close()
 
                         studentData = {
                             "FirstName": data[9] if len(data) > 9 else "",
@@ -446,6 +453,7 @@ def home():
         mycursor = db.cursor()
         mycursor.execute(q,customResponse)
         db.commit()
+        db.close()
         # preparing data to add int Bank Account sheet
         first_name = formData.get('FirstName')
         family = formData.get('Family')
@@ -492,6 +500,7 @@ def home():
         mycursor = db.cursor()
         mycursor.execute(q,bank_data)
         db.commit()
+        db.close()
         
 
         data_list = ["-"] * 86  # Initialize data_list with 86 "-"
@@ -532,6 +541,7 @@ def home():
         mycursor = db.cursor()
         mycursor.execute(q)
         db.commit()
+        db.close()
         print("Fileds in master data table is updated- data2023")
         customResponse = [[date.strftime("%Y/%m/%d, %H:%M:%S"), 'DATA: '+  str(data_list), 'Status: Success']]
         res = {
@@ -552,6 +562,7 @@ def home():
         mycursor = db.cursor()
         mycursor.execute(q,customResponse)
         db.commit()
+        db.close()
         
         return res
    
