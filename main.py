@@ -5,7 +5,6 @@ import requests
 from gevent.pywsgi import WSGIServer
 from flask import Flask,jsonify,request, send_file, render_template
 from flask_cors import CORS, cross_origin
-from helpers.g_sheet_handler import GoogleSheetHandler
 from datetime import datetime
 from requests.exceptions import RequestException
 from urllib.parse import unquote
@@ -47,7 +46,6 @@ def fetch_otp_from_google_sheet(passport_no, phone_no):
         mycursor = db.cursor()
         mycursor.execute(q)
         filtered_data = mycursor.fetchone()
-        # data_ = GoogleSheetHandler(sheet_name=config.SHEET_CODE_STORAGE, spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP).getsheet_records()
         db.close()
     except Exception as e:
         # logger.error(f"Error fetching otp from Google Sheets: {e}")
@@ -68,7 +66,6 @@ def home():
         action = request.args.get('action')
         phone_no = request.args['Phone']
         try:
-            # data_ = GoogleSheetHandler(sheet_name=config.SHEET_USER_DATA_GET, spreadsheet_id=config.SAMPLE_SPREADSHEET_ID).getsheet_records()
             q = f'''select * from data2023
                     where ID='{passport_no}';
                 '''
@@ -110,9 +107,6 @@ def home():
                             customValue = str(request.query_string, 'utf-8')
                             date = datetime.now()
                             customResponse = [[date.strftime("%Y/%m/%d, %H:%M:%S"), 'GET', customValue]]
-                            # data_ = GoogleSheetHandler(data = customResponse,
-                            #             sheet_name=config.SHEET_USER_DATA_LOG,
-                            #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                             q = '''INSERT INTO `logs`
                                     (`log_time`,
                                     `request`,
@@ -132,8 +126,6 @@ def home():
                             if response_json['responseStatus'] == 'ERROR':
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),'',response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                                 data_append = tuple(data_append[0])
                                 append_in_code_storage(config.db_cred,data_append)
                                 
@@ -149,8 +141,6 @@ def home():
                             elif response_json['responseStatus'] == 'Exception':
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),'',response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
 
                                 data_append = tuple(data_append[0])
                                 append_in_code_storage(config.db_cred,data_append)
@@ -167,25 +157,9 @@ def home():
                             else:
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),response_json['verifyCode'],response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #                 spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
-
                                 data_append = tuple(data_append[0])
                                 # print(data_append)
                                 append_in_code_storage(config.db_cred,data_append)
-
-                            # Define a mapping of indices to keys for the data list
-                                # keys_mapping = {
-                                #     9: "FirstName", 10: "Family", 6: "Zihuy", 7: "ZihuyType", 5: "StudyTypeID",
-                                #     12: "BDE", 14: "Group", 0: "Mosd", 15: "GroupZaraeim", 23: "KolelBoker",
-                                #     24: "KolelZarim", 38: "Mail", 33: "StreetNum", 32: "Street", 31: "City",
-                                #     34: "Bank", 35: "Snif", 36: "Account", 39: "MosdName", 40: "MosdAdd",
-                                #     41: "MosdAuthorizedName", 2: "JoiningDate", 37: "MosdId", 4: "MaritalStatus",
-                                #     43: "AdminMail", 8: "Country"
-                                # }
-
-                                # # Create studentData dictionary using a dictionary comprehension
-                                # studentData = {keys_mapping[i]: data[i] if len(data) > i else '' for i in keys_mapping}
 
 
                                 res = json.dumps({
@@ -198,9 +172,6 @@ def home():
                                         "PhoneLast4": f"******{phone_no[-4:]}",
                                         "message" : f"A call was sent to phone ******{phone_no[-4:]}"
                                         })
-
-                                # GoogleSheetHandler(data = [res], sheet_name=config.SHEET_USER_DATA_FSR,spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
-
                                 return res
                     elif action == 'GetStudentsByMosd':
                         if data[11] == passport_no and (data[45] == phone_no[1:] or data[46] == phone_no[1:]):
@@ -208,9 +179,6 @@ def home():
                             customValue = str(request.query_string, 'utf-8')
                             date = datetime.now()
                             customResponse = [[date.strftime("%Y/%m/%d, %H:%M:%S"), 'GET', customValue]]
-                            # data_ = GoogleSheetHandler(data = customResponse,
-                            #             sheet_name=config.SHEET_USER_DATA_LOG,
-                            #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                             q = '''INSERT INTO `logs`
                                     (`log_time`,
                                     `request`,
@@ -230,8 +198,6 @@ def home():
                             if response_json['responseStatus'] == 'ERROR':
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),'',response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                                 data_append = tuple(data_append[0])
                                 append_in_code_storage(config.db_cred,data_append)
                                 return json.dumps({
@@ -246,8 +212,6 @@ def home():
                             elif response_json['responseStatus'] == 'Exception':
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),'',response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                                 data_append = tuple(data_append[0])
                                 append_in_code_storage(config.db_cred,data_append)
                                 return json.dumps({
@@ -262,8 +226,6 @@ def home():
                             else:
                                 date = datetime.now()
                                 data_append = [[date.strftime("%Y-%m-%d %H:%M:%S"),response_json['responseStatus'],int(phone_no),response_json['verifyCode'],response.text]]
-                                # GoogleSheetHandler(data = data_append, sheet_name=config.SHEET_CODE_STORAGE,
-                                #                 spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                                 data_append = tuple(data_append[0])
                                 append_in_code_storage(config.db_cred,data_append)
 
@@ -292,17 +254,11 @@ def home():
                                         "PhoneLast4": f"******{phone_no[-4:]}",
                                         "message" : f"A call was sent to phone ******{phone_no[-4:]}"
                                         })
-
-                                # GoogleSheetHandler(data = [res], sheet_name=config.SHEET_USER_DATA_FSR,spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
-
                                 return res
 
                 customValue = str(request.query_string, 'utf-8')
                 date = datetime.now()
                 customResponse = [[date.strftime("%d/%m/%Y, %H:%M:%S"), 'GET', customValue]]
-                # data_ = GoogleSheetHandler(data = customResponse,
-                #                     sheet_name=config.SHEET_USER_DATA_LOG,
-                #                     spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                 q = '''INSERT INTO `logs`
                                     (`log_time`,
                                     `request`,
@@ -329,9 +285,6 @@ def home():
                 customValue = str(request.query_string, 'utf-8')
                 date = datetime.now()
                 customResponse = [[date.strftime("%d/%m/%Y, %H:%M:%S"), 'GET', customValue]]
-                # data_ = GoogleSheetHandler(data = customResponse,
-                #                     sheet_name=config.SHEET_USER_DATA_LOG,
-                #                     spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                 q = '''INSERT INTO `logs`
                                     (`log_time`,
                                     `request`,
@@ -364,11 +317,6 @@ def home():
                         customValue = str(request.query_string, 'utf-8')
                         date = datetime.now()
                         customResponse = [[date.strftime("%d/%m/%Y, %H:%M:%S"), 'GET', customValue]]
-                        # data_ = GoogleSheetHandler(data = customResponse,
-                        #             sheet_name=config.SHEET_USER_DATA_LOG,
-                        #             spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
-                        #response = requests.get(f'https://www.call2all.co.il/ym/api/RunTzintuk?token=025089532:7974153&callerId=RAND&phones=${phone_no}')
-                        #response_json = json.loads(response.text)
                         q = '''INSERT INTO `logs`
                                     (`log_time`,
                                     `request`,
@@ -425,10 +373,6 @@ def home():
                                 "PhoneLast4": f"******{phone_no[-4:]}",
                                 "message" : "otp validation successfull"
                                 }
-
-                        #GoogleSheetHandler(data = customResponse,
-                        #           sheet_name=config.SHEET_USER_DATA_LOG,
-                        #           spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
                         json_string = json.dumps(res)
                         actual_otp = fetch_otp_from_google_sheet(passport_no, phone_no)
 
@@ -446,12 +390,9 @@ def home():
 
         requestData = json.dumps(request.json)
         decoded_string = unquote(str(requestData), encoding='utf-8')
-
         formData = json.loads(decoded_string)
-        # print('printing form data',formData)
         date = datetime.now()
         customResponse = [[date.strftime("%Y/%m/%d, %H:%M:%S"), 'POST', str(decoded_string)]]
-        # GoogleSheetHandler(data = customResponse, sheet_name=config.SHEET_USER_DATA_FSP, spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
         customResponse = tuple(customResponse[0])
         q = '''INSERT INTO `form_submission_logs`
                 (`post_date`,
@@ -497,13 +438,9 @@ def home():
         for position, element in positions_to_add.items():
             list_of_lists[position] = element
 
-
         bank_data = [list_of_lists]
-
-        # respo = GoogleSheetHandler(data = bank_data, sheet_name=config.BANK_ACCOUNT_SHEET, spreadsheet_id=config.BANK_ACCCOUNTS_SPREADSHEET_ID).appendsheet_records()
         bank_data = bank_data[0][:10]
         bank_data = tuple(bank_data)
-        # print('bank data',bank_data)
         q = '''INSERT INTO `form2011`.`bank_account`
             (`FirstName&Family`,`Zeout`,`bank`,`snif`,`account`,`date`,`AccountByDate_and_ByF`,
             `legal`,`DONT_TOUCH`,`TofesId`)
@@ -537,8 +474,6 @@ def home():
                 pass
         date = datetime.now()
         data_list[1] = date.strftime("%Y/%m/%d %H:%M:%S")
-
-        resp = GoogleSheetHandler(data = [data_list], sheet_name=config.SHEET_FORM_DATA_STORAGE,spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
         q = f'''UPDATE data2023
                 SET City = '{City}', 
                 Street = '{Street}',
@@ -562,7 +497,6 @@ def home():
                 "Request Value" : decoded_string,
                 "Update Data" : data_list,
             }
-        # GoogleSheetHandler(data = customResponse, sheet_name=config.SHEET_USER_DATA_FSR,spreadsheet_id=config.SAMPLE_SPREADSHEET_ID_FSP_2011).appendsheet_records()
         customResponse = tuple(customResponse[0])
         q = '''INSERT INTO `form_submission_response`
                 (`post_date`,
